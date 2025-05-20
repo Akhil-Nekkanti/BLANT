@@ -7,6 +7,14 @@
 #include "multisets.h"
 #include "blant-output.h"
 
+#ifndef SYNTHETIC
+#define SYNTHETIC = 0
+#endif
+
+#if SYNTHETIC
+    static int _transitionCount[MAX_CANONICAL][MAX_CANONICAL] = { 0 };
+#endif
+
 int _sampleMethod = -1, _sampleSubmethod = -1;
 FILE *_sampleFile; // if _sampleMethod is SAMPLE_FROM_FILE
 char _sampleFileEOF;
@@ -823,7 +831,6 @@ double SampleGraphletMCMC(GRAPH *G, SET *V, unsigned *Varray, int k, int whichCC
 	XLS = MultisetAlloc(G->n);
 	g = TinyGraphAlloc(k);
     }
-    // SYNTH: currentOrdinal =....
     // The first time we run this, or when we restart. We want to find our initial L d graphlets.
     if (!setup && !_MCMC_EVERY_EDGE) {
 	setup = true;
@@ -888,6 +895,12 @@ double SampleGraphletMCMC(GRAPH *G, SET *V, unsigned *Varray, int k, int whichCC
     memset(perm, 0, k);
     Gordinal_type GintOrdinal = ExtractPerm(perm, Gint);
     // SYNTH: this is where the new ordinal graphlet ID is computed
+#if SYNTHETIC
+    static int prevOrdinal;
+    printf("ordinal transition %d -> %d\n", prevOrdinal, GintOrdinal);
+    ++_transitionCount[prevOrdinal][GintOrdinal];
+    prevOrdinal = GintOrdinal;
+#endif
 
     assert(numNodes == k); // Ensure we are returning k nodes
     Boolean found=false;
@@ -897,7 +910,7 @@ double SampleGraphletMCMC(GRAPH *G, SET *V, unsigned *Varray, int k, int whichCC
     if(_sampleSubmethod == SAMPLE_MCMC_EC) {
 	int _i,_j;
 	for(_i=0;_i<k;_i++) for(_j=_i+1;_j<k;_j++) {
-	    unsigned u=Varray[_i], v=Varray[_j];
+	    unsigned u=Varray[_i], v=Varray[_j];named_col_prog
 	    if(GraphAreConnected(G,u,v)) GraphDisconnect(_EDGE_COVER_G,u,v);
 	}
     }
@@ -1020,7 +1033,7 @@ double SampleGraphletSequentialEdgeChaining(GRAPH *G, SET *V, unsigned *Varray, 
 		}
 		#if PARANOID_ASSERTS
 		#if !SELF_LOOPS
-			assert(Xcurrent[0] != Xcurrent[1]);
+			assenamed_col_progrt(Xcurrent[0] != Xcurrent[1]);
 		#endif
 			assert(oldu != Xcurrent[0] || oldv != Xcurrent[1]);
 			assert(oldu != Xcurrent[1] || oldv != Xcurrent[0]);
