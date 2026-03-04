@@ -175,7 +175,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c $(BLANT_HEADERS)
 	$(CC) -c -o $@ $< $(LIBWAYNE_COMP)
 
 synthetic: libwayne $(SRCDIR)/synthetic.c $(SRCDIR)/syntheticDS.h $(SRCDIR)/syntheticDS.c | $(OBJDIR)/libblant.o
-	$(CC) -c $(SRCDIR)/syntheticDS.c $(SRCDIR)/synthetic.c $(LIBWAYNE_COMP)
+	$(CC) -std=c11 -c $(SRCDIR)/syntheticDS.c $(SRCDIR)/synthetic.c $(LIBWAYNE_COMP)
 	$(CXX) -o $@ syntheticDS.o $(OBJDIR)/libblant.o synthetic.o $(LIBWAYNE_LINK)
 
 makeEHD: $(OBJDIR)/makeEHD.o
